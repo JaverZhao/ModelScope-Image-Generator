@@ -1,0 +1,1 @@
+{"api_key": "", "default_model": "Tongyi-MAI/Z-Image-Turbo", "default_size": "1024x1024", "advanced_settings": {"steps": 20, "guidance_scale": 3.0, "seed": -1}, "ui_preferences": {"theme": "light", "auto_save_history": true}}
