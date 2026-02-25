@@ -19,13 +19,12 @@ def render_sidebar():
         st.divider()
         
         # 生图参数
-        is_valid = render_generation_params()
+        render_generation_params()
         
         st.divider()
         
-        # 生图按钮
-        if is_valid:
-            render_generate_button()
+        # 生图按钮（始终显示）
+        render_generate_button()
         
         st.divider()
         

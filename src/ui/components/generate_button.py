@@ -21,23 +21,25 @@ def render_generate_button():
     params = st.session_state.params
     
     # 检查参数有效性
-    if not params["prompt"].strip():
-        st.error("请输入提示词")
-        return
+    is_prompt_valid = params["prompt"].strip() != ""
     
     # 检查 API Key
     config_manager = st.session_state.config_manager
     api_key = config_manager.get_api_key()
-    if not api_key:
-        st.error("请先配置 API Key")
+    has_api_key = api_key is not None and api_key != ""
+    
+    # 如果没有 API Key，显示提示
+    if not has_api_key:
+        st.warning("⚠️ 请先配置 API Key")
         return
     
     # 生图按钮
+    is_disabled = st.session_state.task_status == "processing"
     generate_button = st.button(
         "🎨 生成图片",
         type="primary",
         use_container_width=True,
-        disabled=st.session_state.task_status == "processing"
+        disabled=is_disabled
     )
     
     # 状态显示
