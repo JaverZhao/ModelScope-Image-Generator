@@ -92,7 +92,7 @@ def _render_image_card(col, record: dict):
     with col:
         # 缩略图
         if thumbnail_path and os.path.exists(thumbnail_path):
-            st.image(thumbnail_path, use_column_width=True)
+            st.image(thumbnail_path, use_container_width=True)
         else:
             st.markdown(f'<div style="background:#f0f0f0;height:200px;display:flex;align-items:center;justify-content:center;border-radius:8px;">{status_icon}</div>', unsafe_allow_html=True)
         
@@ -127,7 +127,7 @@ def _show_image_detail(record: dict):
             # 大图
             original_path = record.get("original_path", "")
             if original_path and os.path.exists(original_path):
-                st.image(original_path, use_column_width=True)
+                st.image(original_path, use_container_width=True)
             else:
                 st.info("图片文件不存在")
         
@@ -159,7 +159,7 @@ def _show_image_detail(record: dict):
                         f,
                         file_name=f"image_{record['id']}.jpg",
                         mime="image/jpeg",
-                        use_container_width=False
+                        width="content"
                     )
             
             if st.button("🔄 复用参数", key=f"reuse_{record['id']}", width="stretch", type="primary"):
