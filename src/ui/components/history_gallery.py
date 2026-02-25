@@ -131,31 +131,21 @@ def _render_image_card(col, record: dict):
 
 
 def _show_image_detail(record: dict):
-    """显示图片详情弹窗（全屏形式）"""
-    # 使用 modal 创建全屏弹窗
-    with st.expander("", expanded=True):
-        # 自定义样式让 expander 占满全屏
-        st.markdown("""
-            <style>
-            div[data-testid="stExpander"] {
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
-                background: rgba(0, 0, 0, 0.95) !important;
-                z-index: 9999 !important;
-                margin: 0 !important;
-                padding: 2rem !important;
-                overflow: auto !important;
-            }
-            div[data-testid="stExpander"] > div > div {
-                background: rgba(0, 0, 0, 0.95) !important;
-            }
-            </style>
-        """, unsafe_allow_html=True)
-        
-        col1, col2 = st.columns([3, 1])
+    """显示图片详情弹窗（简化版，使用原生布局）"""
+    # 简单的 CSS 样式
+    st.markdown("""
+        <style>
+        .detail-panel {
+            background-color: #f5f5f5;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    # 使用 expander 显示详情
+    with st.expander(f"📷 {record.get('prompt', '')[:30]}...", expanded=True):
+        col1, col2 = st.columns([2, 1])
         
         with col1:
             # 显示原图
@@ -167,34 +157,34 @@ def _show_image_detail(record: dict):
         
         with col2:
             # 信息面板
-            st.markdown('<div style="color: white;">', unsafe_allow_html=True)
+            st.markdown('<div class="detail-panel">', unsafe_allow_html=True)
             
             st.markdown(f"**Prompt:**")
-            st.write(record.get("prompt", ""))
+            st.text(record.get("prompt", ""))
             
             st.markdown(f"**Negative Prompt:**")
-            st.write(record.get("negative_prompt", "") or "无")
+            st.text(record.get("negative_prompt", "") or "无")
             
             st.markdown(f"**模型:**")
-            st.write(record.get("model", ""))
+            st.text(record.get("model", ""))
             
             st.markdown(f"**尺寸:**")
-            st.write(record.get("size", ""))
+            st.text(record.get("size", ""))
             
             st.markdown(f"**步数:**")
-            st.write(record.get("steps", ""))
+            st.text(record.get("steps", ""))
             
             st.markdown(f"**引导系数:**")
-            st.write(record.get("guidance_scale", ""))
+            st.text(record.get("guidance_scale", ""))
             
             st.markdown(f"**种子:**")
-            st.write(record.get("seed", ""))
+            st.text(record.get("seed", ""))
             
             st.markdown(f"**生成时间:**")
             created_at = record.get("created_at", "")
             if created_at:
                 dt = datetime.fromisoformat(created_at)
-                st.write(dt.strftime("%Y-%m-%d %H:%M:%S"))
+                st.text(dt.strftime("%Y-%m-%d %H:%M:%S"))
             
             st.markdown('</div>', unsafe_allow_html=True)
             
