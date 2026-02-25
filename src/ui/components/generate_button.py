@@ -37,8 +37,8 @@ def render_generate_button():
     is_disabled = st.session_state.task_status == "processing"
     generate_button = st.button(
         "🎨 生成图片",
-        type="primary",
-        use_container_width=True,
+        type="secondary",
+        width="stretch",
         disabled=is_disabled
     )
     

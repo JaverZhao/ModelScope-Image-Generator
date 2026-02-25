@@ -108,10 +108,10 @@ def _render_image_card(col, record: dict):
         
         # 操作按钮
         if status == "succeed":
-            if st.button("查看详情", key=f"view_{record_id}", use_container_width=True):
+            if st.button("查看详情", key=f"view_{record_id}", width="stretch", type="primary"):
                 _show_image_detail(record)
         
-        if st.button("删除", key=f"del_{record_id}", use_container_width=True):
+        if st.button("删除", key=f"del_{record_id}", width="stretch", type="primary"):
             history_manager = st.session_state.history_manager
             if history_manager.delete_record(record_id):
                 st.success("删除成功")
@@ -159,10 +159,10 @@ def _show_image_detail(record: dict):
                         f,
                         file_name=f"image_{record['id']}.jpg",
                         mime="image/jpeg",
-                        use_container_width=True
+                        use_container_width=False
                     )
             
-            if st.button("🔄 复用参数", key=f"reuse_{record['id']}", use_container_width=True):
+            if st.button("🔄 复用参数", key=f"reuse_{record['id']}", width="stretch", type="primary"):
                 st.session_state.params.update({
                     "prompt": record.get("prompt", ""),
                     "negative_prompt": record.get("negative_prompt", ""),

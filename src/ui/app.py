@@ -76,14 +76,14 @@ def main():
             配置完成后，请滚动到页面最下方的"API 配置"区域进行配置。
             """)
     
-    # 自定义 CSS
+# 自定义 CSS
     st.markdown("""
         <style>
         .stApp {
             background-color: #f5f5f5;
         }
         .main-header {
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(95deg, #644cfd 0%, #cdc5ff 100%);
             padding: 1rem;
             border-radius: 10px;
             margin-bottom: 1rem;
@@ -101,6 +101,31 @@ def main():
         .status-processing { background-color: #dbeafe; color: #1e40af; }
         .status-succeed { background-color: #d1fae5; color: #065f46; }
         .status-failed { background-color: #fee2e2; color: #991b1b; }
+        /* 自定义 secondary 按钮颜色 - 生图按钮和保存API Key按钮 */
+        div[data-testid="stForm"] button[kind="secondary"] {
+            background-color: #644cfd;
+            color: white;
+        }
+        div[data-testid="stForm"] button[kind="secondary"]:hover {
+            background-color: #5a42f0;
+        }
+        button[kind="secondary"] {
+            background-color: #644cfd !important;
+            color: white !important;
+        }
+        button[kind="secondary"]:hover {
+            background-color: #5a42f0 !important;
+        }
+        /* 确保 primary 按钮显示为白色 */
+        button[kind="primary"] {
+            background-color: white !important;
+            color: #644cfd !important;
+            border: 1px solid #cecece;
+        }
+        button[kind="primary"]:hover {
+            background-color: #f0f0f0 !important;
+            border: 1px solid #644cfd;
+        }
         </style>
     """, unsafe_allow_html=True)
     
