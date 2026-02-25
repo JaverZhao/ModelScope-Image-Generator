@@ -38,6 +38,9 @@ def init_session_state():
             "guidance_scale": 3.0,
             "seed": -1,
         }
+    
+    if "selected_record_id" not in st.session_state:
+        st.session_state.selected_record_id = None
 
 
 def set_page_config():
@@ -125,6 +128,10 @@ def main():
         button[kind="primary"]:hover {
             background-color: #f0f0f0 !important;
             border: 1px solid #644cfd;
+        }
+        /* 隐藏图片的 fullscreen 按钮 */
+        button[data-testid="stFullScreenButton"] {
+            display: none !important;
         }
         </style>
     """, unsafe_allow_html=True)

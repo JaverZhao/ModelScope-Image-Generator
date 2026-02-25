@@ -60,6 +60,14 @@ def render_history_gallery():
     # 分页
     if len(records) >= 50:
         st.info("仅显示最近 50 条记录，完整记录请查看历史文件")
+    
+    # 显示选中的图片详情（全屏弹窗）
+    if st.session_state.get("selected_record_id"):
+        selected_record = next((r for r in records if r["id"] == st.session_state.selected_record_id), None)
+        if selected_record:
+            _show_image_detail(selected_record)
+            # 防止刷新后仍然显示弹窗
+            st.session_state.selected_record_id = None
 
 
 def _render_image_card(col, record: dict):
@@ -90,9 +98,13 @@ def _render_image_card(col, record: dict):
     status_icon = status_colors.get(status, "⚪")
     
     with col:
-        # 缩略图
+        # 缩略图 - 点击按钮查看
         if thumbnail_path and os.path.exists(thumbnail_path):
             st.image(thumbnail_path, use_container_width=True)
+            
+            # 添加查看按钮
+            if st.button("👁️ 查看大图", key=f"thumb_{record_id}", width="stretch", type="primary"):
+                st.session_state.selected_record_id = record_id
         else:
             st.markdown(f'<div style="background:#f0f0f0;height:200px;display:flex;align-items:center;justify-content:center;border-radius:8px;">{status_icon}</div>', unsafe_allow_html=True)
         
@@ -109,7 +121,7 @@ def _render_image_card(col, record: dict):
         # 操作按钮
         if status == "succeed":
             if st.button("查看详情", key=f"view_{record_id}", width="stretch", type="primary"):
-                _show_image_detail(record)
+                st.session_state.selected_record_id = record_id
         
         if st.button("删除", key=f"del_{record_id}", width="stretch", type="primary"):
             history_manager = st.session_state.history_manager
@@ -119,12 +131,34 @@ def _render_image_card(col, record: dict):
 
 
 def _show_image_detail(record: dict):
-    """显示图片详情弹窗"""
-    with st.expander(f"图片详情 - {record['prompt'][:20]}...", expanded=True):
-        col1, col2 = st.columns([2, 1])
+    """显示图片详情弹窗（全屏形式）"""
+    # 使用 modal 创建全屏弹窗
+    with st.expander("", expanded=True):
+        # 自定义样式让 expander 占满全屏
+        st.markdown("""
+            <style>
+            div[data-testid="stExpander"] {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                background: rgba(0, 0, 0, 0.95) !important;
+                z-index: 9999 !important;
+                margin: 0 !important;
+                padding: 2rem !important;
+                overflow: auto !important;
+            }
+            div[data-testid="stExpander"] > div > div {
+                background: rgba(0, 0, 0, 0.95) !important;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+        
+        col1, col2 = st.columns([3, 1])
         
         with col1:
-            # 大图
+            # 显示原图
             original_path = record.get("original_path", "")
             if original_path and os.path.exists(original_path):
                 st.image(original_path, use_container_width=True)
@@ -132,26 +166,41 @@ def _show_image_detail(record: dict):
                 st.info("图片文件不存在")
         
         with col2:
-            # 信息
-            st.markdown("### 📋 详细信息")
-            st.write(f"**模型**: {record.get('model', '')}")
-            st.write(f"**尺寸**: {record.get('size', '')}")
-            st.write(f"**步数**: {record.get('steps', '')}")
-            st.write(f"**引导系数**: {record.get('guidance_scale', '')}")
-            st.write(f"**种子**: {record.get('seed', '')}")
+            # 信息面板
+            st.markdown('<div style="color: white;">', unsafe_allow_html=True)
+            
+            st.markdown(f"**Prompt:**")
+            st.write(record.get("prompt", ""))
+            
+            st.markdown(f"**Negative Prompt:**")
+            st.write(record.get("negative_prompt", "") or "无")
+            
+            st.markdown(f"**模型:**")
+            st.write(record.get("model", ""))
+            
+            st.markdown(f"**尺寸:**")
+            st.write(record.get("size", ""))
+            
+            st.markdown(f"**步数:**")
+            st.write(record.get("steps", ""))
+            
+            st.markdown(f"**引导系数:**")
+            st.write(record.get("guidance_scale", ""))
+            
+            st.markdown(f"**种子:**")
+            st.write(record.get("seed", ""))
+            
+            st.markdown(f"**生成时间:**")
+            created_at = record.get("created_at", "")
+            if created_at:
+                dt = datetime.fromisoformat(created_at)
+                st.write(dt.strftime("%Y-%m-%d %H:%M:%S"))
+            
+            st.markdown('</div>', unsafe_allow_html=True)
             
             st.divider()
             
-            st.markdown("### ✍️ 提示词")
-            st.text_area("Prompt", record.get("prompt", ""), height=100, disabled=True, label_visibility="collapsed")
-            
-            if record.get("negative_prompt"):
-                st.text_area("Negative Prompt", record.get("negative_prompt", ""), height=80, disabled=True, label_visibility="collapsed")
-            
-            st.divider()
-            
-            # 操作
-            original_path = record.get("original_path", "")
+            # 操作按钮
             if original_path and os.path.exists(original_path):
                 with open(original_path, "rb") as f:
                     st.download_button(
@@ -159,10 +208,11 @@ def _show_image_detail(record: dict):
                         f,
                         file_name=f"image_{record['id']}.jpg",
                         mime="image/jpeg",
-                        width="content"
+                        width="stretch",
+                        type="primary"
                     )
             
-            if st.button("🔄 复用参数", key=f"reuse_{record['id']}", width="stretch", type="primary"):
+            if st.button("🔄 复用参数", key=f"reuse_full_{record['id']}", width="stretch", type="primary"):
                 st.session_state.params.update({
                     "prompt": record.get("prompt", ""),
                     "negative_prompt": record.get("negative_prompt", ""),
@@ -172,5 +222,10 @@ def _show_image_detail(record: dict):
                     "guidance_scale": record.get("guidance_scale", 3.0),
                     "seed": record.get("seed", -1),
                 })
-                st.success("参数已复用到左侧输入框")
+                st.success("✅ 参数已复用")
+                st.session_state.selected_record_id = None
+                st.rerun()
+            
+            if st.button("❌ 关闭", key=f"close_full_{record['id']}", width="stretch", type="primary"):
+                st.session_state.selected_record_id = None
                 st.rerun()
