@@ -67,28 +67,19 @@ def render_generate_button():
     if st.session_state.task_status == "processing":
         st.progress(0.5, text="正在生成图片，请稍候...")
     
-    # 处理生图请求
+    # 处理生图请求 - 直接执行，不使用 rerun
     if generate_button and st.session_state.task_status != "processing":
-        st.session_state.task_status = "pending"
-        st.rerun()
-    
-    # 如果状态是 pending，执行生图流程
-    if st.session_state.task_status == "pending":
-        try:
-            _execute_generation(api_key, params)
-        except Exception as e:
-            logger.error(f"Generation failed: {e}")
-            st.error(f"生成失败：{str(e)}")
-            st.session_state.task_status = "failed"
+        _execute_generation(api_key, params)
 
 
 def _execute_generation(api_key: str, params: dict):
     """执行生图流程"""
-    st.session_state.task_status = "processing"
-    st.rerun()
-    
     try:
+        # 设置状态为 processing
+        st.session_state.task_status = "processing"
+        
         # 使用 GenerationService 执行完整流程
+        logger.info("Starting generation process")
         service = GenerationService(api_key)
         
         result = service.generate_image(
@@ -122,5 +113,6 @@ def _execute_generation(api_key: str, params: dict):
         st.error("❌ 请求超时，请稍后重试")
         st.session_state.task_status = "failed"
     except Exception as e:
+        logger.error(f"Generation failed: {e}")
         st.error(f"❌ 未知错误：{str(e)}")
         st.session_state.task_status = "failed"

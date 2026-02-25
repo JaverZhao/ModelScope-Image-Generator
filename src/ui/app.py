@@ -25,6 +25,9 @@ def init_session_state():
     if "task_status" not in st.session_state:
         st.session_state.task_status = "idle"
     
+    if "should_generate" not in st.session_state:
+        st.session_state.should_generate = False
+    
     if "params" not in st.session_state:
         st.session_state.params = {
             "prompt": "",
