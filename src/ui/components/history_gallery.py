@@ -98,13 +98,9 @@ def _render_image_card(col, record: dict):
     status_icon = status_colors.get(status, "⚪")
     
     with col:
-        # 缩略图 - 点击按钮查看
+        # 缩略图
         if thumbnail_path and os.path.exists(thumbnail_path):
             st.image(thumbnail_path, use_container_width=True)
-            
-            # 添加查看按钮
-            if st.button("👁️ 查看大图", key=f"thumb_{record_id}", width="stretch", type="primary"):
-                st.session_state.selected_record_id = record_id
         else:
             st.markdown(f'<div style="background:#f0f0f0;height:200px;display:flex;align-items:center;justify-content:center;border-radius:8px;">{status_icon}</div>', unsafe_allow_html=True)
         
