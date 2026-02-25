@@ -55,6 +55,27 @@ def main():
     set_page_config()
     init_session_state()
     
+    # 检查 API Key 是否配置
+    config_manager = st.session_state.config_manager
+    api_key = config_manager.get_api_key()
+    has_api_key = api_key is not None and api_key != ""
+    
+    # 如果没有配置 API Key，显示弹窗提示
+    if not has_api_key:
+        with st.expander("⚠️ 请先配置 API Key", expanded=True):
+            st.warning("""
+            为了使用 AI 绘图功能，您需要先配置 ModelScope API Key。
+            
+            **如何获取 API Key：**
+            1. 访问 [ModelScope 官网](https://modelscope.cn/)
+            2. 注册并登录账号
+            3. 进入个人中心 → API Keys
+            4. 点击"创建新的 API Key"
+            5. 复制生成的 API Key
+            
+            配置完成后，请滚动到页面最下方的"API 配置"区域进行配置。
+            """)
+    
     # 自定义 CSS
     st.markdown("""
         <style>

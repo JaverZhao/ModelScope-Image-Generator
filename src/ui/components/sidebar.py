@@ -13,11 +13,6 @@ logger = get_logger("sidebar")
 def render_sidebar():
     """渲染左侧栏"""
     with st.container():
-        # API 配置
-        render_api_config()
-        
-        st.divider()
-        
         # 生图参数
         render_generation_params()
         
@@ -40,3 +35,8 @@ def render_sidebar():
         with col2:
             st.metric("处理中", stats["processing"])
             st.metric("失败", stats["failed"], delta_color="inverse")
+        
+        st.divider()
+        
+        # API 配置（移到最下方）
+        render_api_config()
